@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel TV Senac · Case Study · Luan Mendes</title>
+<meta name="description" content="Case study do Painel TV SENAC, sistema de placar em tempo real desenvolvido para a atividade de Sumô de Robôs da Casa Aberta SENAC Itaquera.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Anton', 'sans-serif'],
+          sans: ['Montserrat', 'sans-serif']
+        },
+        colors: {
+          ink: '#111111',
+          paper: '#f2f2ee',
+          teal: '#0b7285',
+          red: '#d6261c',
+          gold: '#f5b800',
+          mint: '#2a9d8f'
+        },
+        boxShadow: {
+          brutal: '7px 7px 0 rgba(17,17,17,.95)',
+          soft: '0 20px 60px rgba(17,17,17,.08)'
+        }
+      }
+    }
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { overflow-x: hidden; }
+  .shot {
+    border: 2px solid #111;
+    border-radius: 18px;
+    box-shadow: 7px 7px 0 rgba(17,17,17,.92);
+    background: #fff;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .shot:hover {
+    transform: translate(-2px,-2px);
+    box-shadow: 10px 10px 0 rgba(17,17,17,.92);
+  }
+  .grid-paper {
+    background-image:
+      linear-gradient(rgba(17,17,17,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(17,17,17,.035) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .metric-card { position: relative; overflow: hidden; }
+  .metric-card::after {
+    content: '';
+    position: absolute;
+    width: 110px;
+    height: 110px;
+    border: 18px solid rgba(255,255,255,.3);
+    border-radius: 999px;
+    right: -28px;
+    bottom: -34px;
+  }
+  .eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 34px;
+    height: 4px;
+    background: currentColor;
+    vertical-align: middle;
+    margin-right: 10px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .shot { transition: none; }
+  }
+</style>
+</head>
+<body class="bg-paper text-ink font-sans antialiased">
+
+<header class="sticky top-0 z-30 bg-paper/90 backdrop-blur border-b border-black/10">
+  <nav class="max-w-6xl mx-auto px-5 md:px-8 py-3 flex items-center justify-between gap-4">
+    <a href="#topo" class="font-display text-xl md:text-2xl tracking-wide">LUAN MENDES</a>
+    <ul class="hidden lg:flex gap-6 text-sm font-bold">
+      <li><a class="hover:text-red transition" href="#problema">Problema</a></li>
+      <li><a class="hover:text-red transition" href="#arquitetura">Como foi feito</a></li>
+      <li><a class="hover:text-red transition" href="#solucao">Solução</a></li>
+      <li><a class="hover:text-red transition" href="#evento">Como foi o evento</a></li>
+      <li><a class="hover:text-red transition" href="#proximos">Próximos passos</a></li>
+    </ul>
+    <a href="https://github.com/iluanmendes/painel_tv_senac" target="_blank" rel="noreferrer" class="text-sm font-bold bg-ink text-white px-4 py-2.5 rounded-xl hover:bg-red transition">Ver código</a>
+  </nav>
+</header>
+
+<main id="topo">
+
+  <!-- HERO -->
+  <section class="relative overflow-hidden grid-paper">
+    <div class="max-w-6xl mx-auto px-5 md:px-8 pt-14 md:pt-20 pb-14 md:pb-20">
+      <div class="max-w-4xl">
+        <h1 class="font-display text-6xl sm:text-7xl md:text-8xl leading-[.9] mt-4">PAINEL TV SENAC<br><span class="text-teal">PLACAR CASA ABERTA</span></h1>
+        <p class="mt-6 max-w-3xl text-base md:text-xl leading-relaxed">Sistema de placar e gerenciamento de partidas desenvolvido para a atividade de <b>Sumô de Robôs</b> da Casa Aberta SENAC. O juiz controla a competição pelo celular e o público acompanha as informações na TV com atualização em tempo real.</p>
+
+        <div class="mt-7 flex flex-wrap gap-3 text-xs md:text-sm font-bold">
+          <span class="bg-white border-2 border-ink rounded-full px-4 py-2">Node.js</span>
+          <span class="bg-white border-2 border-ink rounded-full px-4 py-2">Express</span>
+          <span class="bg-white border-2 border-ink rounded-full px-4 py-2">Socket.IO</span>
+          <span class="bg-white border-2 border-ink rounded-full px-4 py-2">HTML · CSS · JavaScript</span>
+          <span class="bg-white border-2 border-ink rounded-full px-4 py-2">UX/UI</span>
+        </div>
+      </div>
+
+      <div class="mt-10 grid lg:grid-cols-[1.4fr_.6fr] gap-6 items-stretch">
+        <figure>
+          <img class="shot w-full object-cover" src="Tela2_modo_torneio_aberta.png" alt="Modo Torneio exibido na TV durante a competição de Sumô de Robôs" loading="eager">
+          <figcaption class="mt-3 text-sm text-black/65">Tela pública do modo Torneio, projetada para leitura rápida à distância.</figcaption>
+        </figure>
+        <div class="bg-ink text-white rounded-2xl p-6 md:p-7 shadow-brutal flex flex-col justify-between">
+          <div>
+            <p class="text-gold text-xs font-bold uppercase tracking-[.18em]">O que este projeto resolve</p>
+            <h2 class="font-display text-3xl md:text-4xl mt-2">PLACAR + OPERAÇÃO + FLUXO</h2>
+            <p class="mt-4 text-sm leading-relaxed text-white/80">Uma única aplicação para controlar partidas, organizar participantes e comunicar o estado da competição para quem está na arena e para quem está assistindo.</p>
+          </div>
+          <div class="mt-7 border-t border-white/15 pt-5 text-sm">
+            <div class="flex items-center justify-between gap-4"><span class="text-white/60">Interfaces</span><b>2</b></div>
+            <div class="flex items-center justify-between gap-4 mt-3"><span class="text-white/60">Modos</span><b>Torneio + Freestyle</b></div>
+            <div class="flex items-center justify-between gap-4 mt-3"><span class="text-white/60">Comunicação</span><b>Tempo real</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESUMO -->
+  <section class="max-w-6xl mx-auto px-5 md:px-8 py-12 md:py-16">
+    <div class="grid md:grid-cols-3 gap-5">
+      <article class="bg-white border-2 border-ink rounded-2xl p-6 shadow-soft">
+        <p class="text-xs font-bold uppercase tracking-[.15em] text-teal">O que foi feito</p>
+        <h2 class="font-display text-3xl mt-2">DUAS VISÕES</h2>
+        <p class="mt-3 text-sm leading-relaxed">Painel de controle para o juiz e tela pública para a TV, com estado compartilhado em tempo real.</p>
+      </article>
+      <article class="bg-white border-2 border-ink rounded-2xl p-6 shadow-soft">
+        <p class="text-xs font-bold uppercase tracking-[.15em] text-red">Como foi feito</p>
+        <h2 class="font-display text-3xl mt-2">UMA FONTE DE VERDADE</h2>
+        <p class="mt-3 text-sm leading-relaxed">Servidor Node.js com Socket.IO centralizando cronômetro, placar, fila e ranking.</p>
+      </article>
+      <article class="bg-white border-2 border-ink rounded-2xl p-6 shadow-soft">
+        <p class="text-xs font-bold uppercase tracking-[.15em] text-gold">Qual foi o resultado</p>
+        <h2 class="font-display text-3xl mt-2">USO EM EVENTO REAL</h2>
+        <p class="mt-3 text-sm leading-relaxed">Mais de 100 partidas apoiadas, mais de 300 pessoas alcançadas e uso em três turnos.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- PROBLEMA -->
+  <section id="problema" class="max-w-6xl mx-auto px-5 md:px-8 py-14 md:py-16 border-t border-black/10">
+    <p class="eyebrow text-sm font-bold text-red uppercase tracking-[.18em]">01 · Contexto</p>
+    <h2 class="font-display text-5xl md:text-6xl mt-2">PROBLEMA E OPORTUNIDADE</h2>
+    <div class="mt-7 grid lg:grid-cols-[.8fr_1.2fr] gap-10">
+      <p class="text-base md:text-lg leading-relaxed">Durante a Casa Aberta, a atividade de Sumô de Robôs exigia uma operação contínua: partidas em sequência, participantes esperando sua vez, público acompanhando de diferentes pontos da arena e juízes realizando comandos rapidamente.</p>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <article class="bg-white border border-black/10 rounded-2xl p-5">
+          <span class="font-display text-3xl text-red">01</span>
+          <h3 class="font-bold mt-2">Visibilidade</h3>
+          <p class="mt-2 text-sm">O placar precisava ser compreendido a metros de distância, em uma TV.</p>
+        </article>
+        <article class="bg-white border border-black/10 rounded-2xl p-5">
+          <span class="font-display text-3xl text-red">02</span>
+          <h3 class="font-bold mt-2">Tempo real</h3>
+          <p class="mt-2 text-sm">O comando do juiz precisava refletir rapidamente na tela pública.</p>
+        </article>
+        <article class="bg-white border border-black/10 rounded-2xl p-5">
+          <span class="font-display text-3xl text-red">03</span>
+          <h3 class="font-bold mt-2">Operação</h3>
+          <p class="mt-2 text-sm">A interface precisava funcionar sob pressão, com poucos passos e botões grandes.</p>
+        </article>
+        <article class="bg-white border border-black/10 rounded-2xl p-5">
+          <span class="font-display text-3xl text-red">04</span>
+          <h3 class="font-bold mt-2">Fluxo</h3>
+          <p class="mt-2 text-sm">O modo Freestyle precisava organizar a fila e manter o ranking dos tempos.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARQUITETURA -->
+  <section id="arquitetura" class="max-w-6xl mx-auto px-5 md:px-8 py-14 md:py-16 border-t border-black/10">
+    <p class="eyebrow text-sm font-bold text-red uppercase tracking-[.18em]">02 · Engenharia</p>
+    <h2 class="font-display text-5xl md:text-6xl mt-2">COMO FOI FEITO</h2>
+    <p class="mt-4 max-w-3xl leading-relaxed">O servidor é a fonte de verdade da competição. O painel envia comandos, o servidor atualiza o estado e transmite o resultado para as telas conectadas.</p>
+
+    <div class="mt-8 grid md:grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-3 text-center text-sm font-bold">
+      <div class="bg-white border-2 border-ink rounded-2xl p-5">Painel de Controle<br><span class="font-normal text-black/65">celular do juiz · <code>controle.html</code></span></div>
+      <div class="text-red text-3xl">⇄</div>
+      <div class="bg-ink text-white rounded-2xl p-5 shadow-brutal">Servidor Node.js<br><span class="font-normal text-gold">Express + Socket.IO</span><br><span class="font-normal text-white/70">estado + <code>ranking.json</code></span></div>
+      <div class="text-red text-3xl">⇄</div>
+      <div class="bg-white border-2 border-ink rounded-2xl p-5">TV do público<br><span class="font-normal text-black/65">arena · <code>index.html</code></span></div>
+    </div>
+
+    <div class="mt-8 grid md:grid-cols-2 gap-5 text-sm">
+      <article class="bg-white border border-black/10 rounded-2xl p-6">
+        <h3 class="font-bold text-lg">Decisões técnicas</h3>
+        <ul class="mt-3 space-y-3 list-disc pl-5">
+          <li><b>Socket.IO:</b> comunicação em tempo real entre painel, servidor e TV.</li>
+          <li><b>Estado no servidor:</b> cronômetro e placar não dependem do navegador do juiz.</li>
+          <li><b>Persistência em <code>ranking.json</code>:</b> configurações, ranking Freestyle e fila sobrevivem a reinícios.</li>
+          <li><b>Acesso protegido:</b> o painel de controle exige autenticação.</li>
+        </ul>
+      </article>
+      <article class="bg-white border border-black/10 rounded-2xl p-6">
+        <h3 class="font-bold text-lg">Decisões de interface</h3>
+        <ul class="mt-3 space-y-3 list-disc pl-5">
+          <li><b>HTML, JS e CSS Vanilla:</b> controle direto do layout, responsividade e animações.</li>
+          <li><b>Tipografia de impacto:</b> Anton para títulos e elementos de destaque; Montserrat para textos.</li>
+          <li><b>Cor como semântica:</b> azul e vermelho identificam os competidores.</li>
+          <li><b>Feedback sonoro:</b> eventos importantes também são comunicados por áudio.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- SOLUÇÃO -->
+  <section id="solucao" class="max-w-6xl mx-auto px-5 md:px-8 py-14 md:py-16 border-t border-black/10">
+    <p class="eyebrow text-sm font-bold text-teal uppercase tracking-[.18em]">03 · Experiência</p>
+    <h2 class="font-display text-5xl md:text-6xl mt-2">A SOLUÇÃO VISUAL</h2>
+    <p class="mt-4 max-w-3xl leading-relaxed">Duas interfaces para necessidades diferentes: o público precisa enxergar de longe; o juiz precisa agir rapidamente.</p>
+
+    <h3 class="font-display text-4xl text-teal mt-12">VISÃO DO PÚBLICO · TV</h3>
+    <p class="mt-2 text-sm max-w-3xl">Elementos grandes, contraste alto e foco nas informações essenciais da partida.</p>
+    <div class="mt-6 grid md:grid-cols-2 gap-7">
+      <figure>
+        <img class="shot w-full" src="Tela1_casa_aberta.png" alt="TV em espera com a marca Casa Aberta SENAC e mensagem de aguardando início" loading="lazy">
+        <figcaption class="mt-3 text-sm"><b>Espera.</b> O estado inicial informa que o sistema está pronto para a próxima partida.</figcaption>
+      </figure>
+      <figure>
+        <img class="shot w-full" src="Tela2_modo_torneio_aberta.png" alt="Placar do modo Torneio com Robô Azul contra Robô Vermelho e cronômetro" loading="lazy">
+        <figcaption class="mt-3 text-sm"><b>Modo Torneio.</b> Pontuação nas laterais e cronômetro no centro para rápida leitura.</figcaption>
+      </figure>
+      <figure>
+        <img class="shot w-full" src="TelaVitoria_controle_preparacao_partida_casa_aberta.png" alt="Placar com mensagem de vitória do Robô Azul" loading="lazy">
+        <figcaption class="mt-3 text-sm"><b>Vitória.</b> O resultado é comunicado visualmente no próprio painel da TV.</figcaption>
+      </figure>
+      <figure>
+        <img class="shot w-full" src="ModoFreestyle_ranking.png" alt="Modo Freestyle com cronômetro e ranking dos melhores tempos" loading="lazy">
+        <figcaption class="mt-3 text-sm"><b>Modo Freestyle.</b> A tela combina a tentativa atual com o ranking da competição.</figcaption>
+      </figure>
+      <figure class="md:col-span-2 max-w-3xl mx-auto">
+        <img class="shot w-full" src="Freestyle_ranking.png" alt="Tela do ranking Freestyle ordenado por tempo" loading="lazy">
+        <figcaption class="mt-3 text-sm"><b>Só ranking.</b> O operador pode priorizar ranking, placar ou ambos conforme o momento do evento.</figcaption>
+      </figure>
+    </div>
+
+    <h3 class="font-display text-4xl text-red mt-16">VISÃO DO JUIZ · PAINEL DE CONTROLE</h3>
+    <p class="mt-2 text-sm max-w-3xl">Projetado para smartphone, com ações grandes, rótulos diretos e comandos críticos visualmente diferenciados.</p>
+    <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
+      <figure>
+        <img class="shot w-full" src="Tela1_controle_casa_aberta.png" alt="Tela de login do painel de controle com campo de senha" loading="lazy">
+        <figcaption class="mt-3 text-sm"><b>Login.</b> Acesso protegido aos comandos do painel.</figcaption>
+      </figure>
+      <figure>
+        <img class="shot w-full" src="Tela2_controle_modos_casa_aberta.png" alt="Seleção entre modo Torneio e modo Freestyle" loading="lazy">
+        <figcaption class="mt-3 text-sm"><b>Escolha do modo.</b> Torneio e Freestyle ficam disponíveis em ações grandes e claras.</figcaption>
+      </figure>
+      <figure>
+        <img class="shot w-full" src="Tela3_controle_preparacao_partida_casa_aberta.png" alt="Controle do modo Torneio com botões de iniciar partida e registrar pontos" loading="lazy">
+        <figcaption class="mt-3 text-sm"><b>Partida.</b> Mini-placar no topo e ações de pontuação por competidor.</figcaption>
+      </figure>
+      <figure>
+        <img class="shot w-full" src="Configuracoes_campeonato.png" alt="Configurações do campeonato com tempos do Torneio e do Freestyle" loading="lazy">
+        <figcaption class="mt-3 text-sm"><b>Configurações.</b> Tempos da competição ajustáveis sem alterar o código.</figcaption>
+      </figure>
+      <figure>
+        <img class="shot w-full" src="Configuracaoes_modo_freestyle.png" alt="Preparação do modo Freestyle com nomes dos robôs e opções de exibição na TV" loading="lazy">
+        <figcaption class="mt-3 text-sm"><b>Preparar Freestyle.</b> Define participantes e o conteúdo exibido na TV.</figcaption>
+      </figure>
+      <figure>
+        <img class="shot w-full" src="FilaParticipantes.png" alt="Fila de participantes vazia com campo para adicionar nomes" loading="lazy">
+        <figcaption class="mt-3 text-sm"><b>Fila vazia.</b> O estado inicial orienta o operador sobre o próximo passo.</figcaption>
+      </figure>
+      <figure class="sm:col-span-2 lg:col-span-3 max-w-md mx-auto">
+        <img class="shot w-full" src="Modo_fila_participantes.png" alt="Fila de participantes com ações para organizar a ordem e encaminhar cada competidor" loading="lazy">
+        <figcaption class="mt-3 text-sm"><b>Fila em uso.</b> O operador consegue reorganizar participantes e encaminhar o próximo competidor.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- EVENTO -->
+  <section id="evento" class="bg-ink text-white py-16 md:py-20">
+    <div class="max-w-6xl mx-auto px-5 md:px-8">
+      <p class="eyebrow text-sm font-bold text-gold uppercase tracking-[.18em]">04 · O projeto em operação</p>
+      <div class="grid lg:grid-cols-[.8fr_1.2fr] gap-10 items-end">
+        <div>
+          <h2 class="font-display text-5xl md:text-7xl mt-2 leading-[.92]">COMO FOI O EVENTO</h2>
+          <p class="mt-6 max-w-xl text-white/75 leading-relaxed">O painel saiu do contexto de desenvolvimento e foi utilizado como ferramenta operacional durante a Casa Aberta SENAC, apoiando a atividade de Sumô de Robôs em três turnos diferentes.</p>
+        </div>
+        <div class="border-l-2 border-gold pl-6">
+          <p class="text-sm text-white/60 uppercase tracking-[.15em] font-bold">Uso em contexto real</p>
+          <p class="mt-3 text-xl md:text-2xl font-semibold leading-relaxed">A aplicação ajudou a organizar a sequência de partidas, atualizar os resultados para o público e reduzir tarefas manuais para professores e juízes.</p>
+        </div>
+      </div>
+
+      <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <article class="metric-card rounded-2xl bg-teal p-6 min-h-[190px]">
+          <p class="text-xs font-bold uppercase tracking-[.15em] text-white/75">Partidas apoiadas</p>
+          <p class="font-display text-7xl mt-5 leading-none">100+</p>
+          <p class="mt-3 text-sm text-white/80">Partidas de Sumô de Robôs conduzidas com apoio do painel.</p>
+        </article>
+        <article class="metric-card rounded-2xl bg-red p-6 min-h-[190px]">
+          <p class="text-xs font-bold uppercase tracking-[.15em] text-white/75">Pessoas alcançadas</p>
+          <p class="font-display text-7xl mt-5 leading-none">300+</p>
+          <p class="mt-3 text-sm text-white/80">Entre jogadores e plateia acompanhando a atividade.</p>
+        </article>
+        <article class="metric-card rounded-2xl bg-gold text-ink p-6 min-h-[190px]">
+          <p class="text-xs font-bold uppercase tracking-[.15em] text-black/60">Equipe apoiada</p>
+          <p class="font-display text-7xl mt-5 leading-none">10+</p>
+          <p class="mt-3 text-sm text-black/70">Professores e juízes com uma operação mais centralizada.</p>
+        </article>
+        <article class="metric-card rounded-2xl bg-white text-ink p-6 min-h-[190px]">
+          <p class="text-xs font-bold uppercase tracking-[.15em] text-black/55">Operação</p>
+          <p class="font-display text-7xl mt-5 leading-none">3</p>
+          <p class="mt-3 text-sm text-black/65">Turnos diferentes de funcionamento durante o evento.</p>
+        </article>
+      </div>
+
+      <div class="mt-8 grid md:grid-cols-3 gap-4">
+        <article class="border border-white/15 rounded-2xl p-5">
+          <p class="text-gold font-bold text-xs uppercase tracking-[.15em]">Antes</p>
+          <h3 class="font-display text-3xl mt-2">PREPARAR</h3>
+          <p class="mt-2 text-sm text-white/70">Configuração dos tempos, preparação das partidas e organização da fila de participantes.</p>
+        </article>
+        <article class="border border-white/15 rounded-2xl p-5">
+          <p class="text-gold font-bold text-xs uppercase tracking-[.15em]">Durante</p>
+          <h3 class="font-display text-3xl mt-2">OPERAR</h3>
+          <p class="mt-2 text-sm text-white/70">Juízes registrando pontos e resultados pelo celular enquanto a TV mantinha o público atualizado.</p>
+        </article>
+        <article class="border border-white/15 rounded-2xl p-5">
+          <p class="text-gold font-bold text-xs uppercase tracking-[.15em]">Resultado</p>
+          <h3 class="font-display text-3xl mt-2">CONTINUAR</h3>
+          <p class="mt-2 text-sm text-white/70">A mesma aplicação sustentou a operação em três turnos, mantendo dados e fluxo da competição centralizados.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTADO -->
+  <section id="resultado" class="max-w-6xl mx-auto px-5 md:px-8 py-14 md:py-16">
+    <p class="eyebrow text-sm font-bold text-red uppercase tracking-[.18em]">05 · Resultado</p>
+    <h2 class="font-display text-5xl md:text-6xl mt-2">O QUE MUDOU NA PRÁTICA</h2>
+    <div class="mt-7 grid md:grid-cols-3 gap-5">
+      <article class="bg-white border-2 border-ink rounded-2xl p-6 shadow-soft">
+        <h3 class="font-display text-3xl text-teal">TEMPO REAL</h3>
+        <p class="mt-3 text-sm leading-relaxed">Pontos, cronômetro e resultado são refletidos na TV a partir das ações realizadas no painel.</p>
+      </article>
+      <article class="bg-white border-2 border-ink rounded-2xl p-6 shadow-soft">
+        <h3 class="font-display text-3xl text-red">FLUXO ORGANIZADO</h3>
+        <p class="mt-3 text-sm leading-relaxed">Fila de participantes e ranking Freestyle reduzem dependência de controles manuais durante a operação.</p>
+      </article>
+      <article class="bg-white border-2 border-ink rounded-2xl p-6 shadow-soft">
+        <h3 class="font-display text-3xl text-gold">DADOS PRESERVADOS</h3>
+        <p class="mt-3 text-sm leading-relaxed">Configurações, fila e ranking são persistidos em disco e podem ser recuperados após reinicializações.</p>
+      </article>
+    </div>
+    <div class="mt-7 bg-ink text-white rounded-2xl p-7 md:p-8 shadow-brutal">
+      <p class="text-gold text-xs font-bold uppercase tracking-[.18em]">Aprendizados</p>
+      <p class="mt-3 text-lg md:text-xl max-w-4xl leading-relaxed">Separar as visões do público e do operador simplificou as decisões de interface. Manter o estado da competição no servidor tornou a tela pública independente do dispositivo do juiz e facilitou a operação contínua do evento.</p>
+    </div>
+  </section>
+
+  <!-- PRÓXIMOS PASSOS -->
+  <section id="proximos" class="max-w-6xl mx-auto px-5 md:px-8 py-14 md:py-16 border-t border-black/10">
+    <p class="eyebrow text-sm font-bold text-red uppercase tracking-[.18em]">06 · Evolução</p>
+    <h2 class="font-display text-5xl md:text-6xl mt-2">PRÓXIMOS PASSOS</h2>
+    <ul class="mt-7 grid md:grid-cols-3 gap-5 text-sm">
+      <li class="bg-white border border-black/10 rounded-2xl p-6"><b>Exportação de logs</b><br><span class="text-black/65">Histórico de partidas e pontuações em CSV/JSON para análise pós-evento.</span></li>
+      <li class="bg-white border border-black/10 rounded-2xl p-6"><b>Banco de dados relacional</b><br><span class="text-black/65">Migrar do <code>ranking.json</code> para um banco SQL com histórico por edição do evento.</span></li>
+      <li class="bg-white border border-black/10 rounded-2xl p-6"><b>Segurança</b><br><span class="text-black/65">Retirar a senha do código-fonte e utilizar variável de ambiente.</span></li>
+    </ul>
+  </section>
+
+</main>
+
+<footer class="bg-ink text-white">
+  <div class="max-w-6xl mx-auto px-5 md:px-8 py-10 flex flex-wrap items-center justify-between gap-5">
+    <div>
+      <p class="font-display text-2xl">LUAN MENDES</p>
+      <p class="text-sm text-white/70 mt-1">Instrutor de tecnologia · Desenvolvedor · UX/UI</p>
+    </div>
+    <a href="https://github.com/iluanmendes/painel_tv_senac" target="_blank" rel="noreferrer" class="bg-gold text-ink font-bold px-5 py-3 rounded-xl hover:bg-white transition">Repositório no GitHub →</a>
+  </div>
+</footer>
+
+</body>
+</html>
